@@ -1,23 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { SpeechBubble } from "react-kawaii";
+import "./App.css";
 
 function App() {
+  const [house, setHouse] = useState("");
+  const [classmates, setClassmates] = useState(false);
+  const [loading, setLoading] = useState("");
+
+  const handleClick = async () => {
+    setLoading(true);
+    const resp = await fetch("https://mpc-harrypotter.builtwithdark.com/sort");
+    const body = await resp.json();
+    console.log(body);
+    setHouse(body.house);
+    setClassmates(body.classmates);
+    setLoading(false);
+  };
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <div className={loading ? "shaking" : ""} onClick={handleClick}>
+          <SpeechBubble mood={loading ? "sad" : house ? "shocked" : "happy"} />
+        </div>
+        {house && <h1>{house}</h1>}
+        {classmates && (
+          <p>
+            <h2>You're in good company:</h2>
+            {classmates.map((classmate) => (
+              <div key={classmate.name}>{classmate.name}</div>
+            ))}
+          </p>
+        )}
+        {!house && <p>Click me to be sorted!</p>}
       </header>
     </div>
   );
